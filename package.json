@@ -1,0 +1,19 @@
+{
+  "name": "telegrambot-ywp",
+  "version": "1.0.0",
+  "description": "Bro Pann's Server to Interact with Telegram Bot",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yan Waipann",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "node-fetch": "^2.6.1",
+    "node-telegram-bot-api": "^0.51.0",
+    "nodemon": "^2.0.7"
+  }
+}
