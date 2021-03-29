@@ -85,6 +85,29 @@ bot.onText(
   },
 );
 
+// Matches /tell_a_joke
+bot.onText(
+  /^(\/tell_a_joke|\/tell_a_joke@zer0exploit_rhm_bot)$/,
+  async (msg) => {
+    const chatId = msg.chat.id;
+    try {
+      const response = await fetch(`${process.env.JOKE_API_URI}`);
+
+      if (response.status !== 200) {
+        throw new Error('Something went wrong on the origin servers.');
+      }
+
+      if (response.status === 200) {
+        const joke = await response.json();
+        const message = `<b>Set Up</b>: ${joke.setup}\n<b>Punch line</b>: <i>${joke.punchline}</i>\n\n<i>Tip: If you didn't understand this joke, just accept the fact that you're dumb and move on. :)</i>`;
+        bot.sendMessage(chatId, message, { parse_mode: 'HTML' });
+      }
+    } catch (error) {
+      bot.sendMessage(chatId, error.message);
+    }
+  },
+);
+
 app.get('/', (req, res) => {
   res.send('<h1>Hello!</h1>');
 });
