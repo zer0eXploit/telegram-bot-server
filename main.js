@@ -66,6 +66,25 @@ bot.onText(
   },
 );
 
+// Matches /steam_10_bestsellers
+bot.onText(
+  /^(\/steam_10_bestsellers|\/steam_10_bestsellers@zer0exploit_rhm_bot)$/,
+  async (msg) => {
+    const chatId = msg.chat.id;
+    try {
+      const response = await fetch(
+        `${process.env.BACKEND_URI}/steam_bestsellers?chat_id=${chatId}`,
+      );
+
+      if (response.status !== 200) {
+        throw new Error('Something went wrong on the origin servers.');
+      }
+    } catch (error) {
+      bot.sendMessage(chatId, error.message);
+    }
+  },
+);
+
 app.get('/', (req, res) => {
   res.send('<h1>Hello!</h1>');
 });
