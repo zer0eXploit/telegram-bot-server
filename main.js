@@ -12,7 +12,7 @@ const bot = new TelegramBot(token, { polling: true });
 // Introduction
 bot.onText(/^(\/introduce|\/introduce@zer0exploit_rhm_bot)/, (msg, match) => {
   const chatId = msg.chat.id;
-  const resp = `Hello <b>${msg.from.first_name} ${msg.from.last_name}</b>! My name is as you know. I am created by my master <b>Bro Pann</b>, the almighty. Long hail Bro Pann!`;
+  const resp = `Hello <b>${msg.from.first_name} ${msg.from.last_name}</b>! My name is as you know. I am created by my master <b>Bro Pann</b>, the almighty. All hail Bro Pann!`;
   bot.sendMessage(chatId, resp, { parse_mode: 'HTML' });
 });
 
