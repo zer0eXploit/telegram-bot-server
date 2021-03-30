@@ -111,6 +111,23 @@ bot.onText(
   },
 );
 
+// Matches /say_mtc_s_gg
+bot.onText(
+  /^(\/say_mtc_s_gg|\/say_mtc_s_gg@zer0exploit_rhm_bot)$/,
+  async (msg) => {
+    const chatId = msg.chat.id;
+    bot.sendVoice(
+      chatId,
+      'AwACAgUAAxkBAAIDCWBjWRoFAAGEq__nvTghtN1pvE9_QwACVAADsDqQVztXoJ-6ZO2JHgQ',
+    );
+  },
+);
+
+// To get file id
+bot.on('message', (message) => {
+  console.log(message);
+});
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
