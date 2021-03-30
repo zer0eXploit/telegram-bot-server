@@ -6,6 +6,9 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const app = express();
 
+// Static Folder Setup
+app.use(express.static(__dirname + '/public'));
+
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_API_KEY;
 
@@ -109,7 +112,7 @@ bot.onText(
 );
 
 app.get('/', (req, res) => {
-  res.send('<h1>Hello!</h1>');
+  res.sendFile(__dirname + '/views/index.html');
 });
 
 const PORT = process.env.PORT || '3000';
