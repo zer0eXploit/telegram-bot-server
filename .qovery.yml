@@ -1,15 +1,11 @@
 ---
 application:
-  name: "garufuren-api"
-  project: "bro-pann-garufurendo"
+  name: "garufurendo"
+  project: "Telegram Bot"
   organization: "QoveryCommunity"
-databases:
-- type: "MONGODB"
-  name: "ガルフレンド"
-  version: "4.4"
 routers:
-- name: "main-garufuren-api"
+- name: "main-garufurendo"
   routes:
-  - application_name: "garufuren-api"
+  - application_name: "garufurendo"
     paths:
     - "/*"
