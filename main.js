@@ -8,6 +8,7 @@ const app = express();
 
 // Static Folder Setup
 app.use(express.static(__dirname + '/public'));
+app.use(express.json());
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_API_KEY;
