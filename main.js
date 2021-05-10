@@ -133,9 +133,31 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-app.post('/ifttt-post', (req, res) => {
-  console.log(req.body);
-  res.status(204).end();
+app.post('/ifttt-post', async (req, res) => {
+  const { username, link, text } = req.body;
+  const triggerEventUri = process.env.IFTTT_TRIGGER_EVENT_URI;
+  try {
+    const response = await fetch(triggerEventUri, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        value1: username,
+        value2: link,
+        value3: text,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    res.status(204).end();
+  } catch (e) {
+    console.log(e);
+    res.status(500).end();
+  }
 });
 
 const PORT = process.env.PORT || '3000';
