@@ -132,5 +132,10 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-const PORT = process.env.PORT || '3000';
+app.post('/ifttt-post', (req, res) => {
+  console.log(req.body);
+  res.status(204).end();
+});
+
+const PORT = process.env.PORT || '80';
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`));
