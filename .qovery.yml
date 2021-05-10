@@ -1,11 +1,11 @@
 ---
 application:
-  name: "garufurendo"
-  project: "Telegram Bot"
+  name: "garufurendo-backend"
+  project: "Telegram Bot Backend"
   organization: "QoveryCommunity"
 routers:
-- name: "main-garufurendo"
+- name: "main-garufurendo-backend"
   routes:
-  - application_name: "garufurendo"
+  - application_name: "garufurendo-backend"
     paths:
     - "/*"
