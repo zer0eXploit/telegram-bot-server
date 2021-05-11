@@ -136,6 +136,8 @@ app.get('/', (req, res) => {
 
 app.post('/ifttt-post', async (req, res) => {
   const [text, username, link] = req.body.split(' @splitter ');
+  console.log(req.body);
+  console.log(username, text, link);
   const triggerEventUri = process.env.IFTTT_TRIGGER_EVENT_URI;
   try {
     const response = await fetch(triggerEventUri, {
