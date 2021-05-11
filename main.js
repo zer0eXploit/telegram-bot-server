@@ -9,6 +9,7 @@ const app = express();
 // Static Folder Setup
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
+app.use(express.text());
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_API_KEY;
@@ -134,7 +135,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/ifttt-post', async (req, res) => {
-  const { username, link, text } = req.body;
+  const [text, username, link] = req.body.split(' @splitter ');
   const triggerEventUri = process.env.IFTTT_TRIGGER_EVENT_URI;
   try {
     const response = await fetch(triggerEventUri, {
