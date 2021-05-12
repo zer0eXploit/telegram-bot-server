@@ -6,6 +6,15 @@ const fetch = require('node-fetch');
 // @route   POST /ifttt/user-tweeted
 // @access  Public
 exports.specificUserTweeted = async (req, res) => {
+  const key = req.query.accessKey;
+
+  if (key !== process.env.SERVER_ACCESS_KEY) {
+    return res.status(403).json({
+      error: true,
+      message: 'Access key is required!',
+    });
+  }
+
   const text = req.body.split(' @splitter ')[0];
   // username and link at indices 1 and 2 respectively
 
