@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
+const fetch = require('node-fetch');
 
 const token = process.env.BOT_API_KEY;
 
