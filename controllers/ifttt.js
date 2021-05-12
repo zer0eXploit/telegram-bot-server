@@ -12,9 +12,10 @@ exports.specificUserTweeted = async (req, res) => {
   try {
     const parameters = {
       status: text,
+      trim_user: true,
     };
 
-    const tweet = Twitter.tweets.statusesUpdate(parameters);
+    const tweet = await Twitter.tweets.statusesUpdate(parameters);
 
     return res.status(200).json({
       success: true,
