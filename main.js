@@ -3,7 +3,6 @@ require('dotenv').config();
 const express = require('express');
 const fetch = require('node-fetch');
 const TelegramBot = require('node-telegram-bot-api');
-const Twitter = require('./helper/twitter-api');
 
 const app = express();
 
@@ -14,6 +13,7 @@ app.use(express.text());
 
 // Routes
 const homeRoute = require('./routes/home');
+const iftttRoute = require('./routes/ifttt');
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_API_KEY;
@@ -134,52 +134,8 @@ bot.on('message', (message) => {
   console.log(message);
 });
 
-app.post('/ifttt-post', async (req, res) => {
-  const [text, username, link] = req.body.split(' @splitter ');
-  console.log(req.body);
-  console.log(username, text, link);
-  const triggerEventUri = process.env.IFTTT_TRIGGER_EVENT_URI;
-  try {
-    const response = await fetch(triggerEventUri, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        value1: username,
-        value2: link,
-        value3: text,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    res.status(204).end();
-  } catch (e) {
-    console.log(e);
-    res.status(500).end();
-  }
-});
-
-app.get('/tw-test', async (req, res) => {
-  try {
-    const data = await Twitter.tweets.statusesUpdate({
-      status: 'Tweeted via Twitter API.',
-    });
-
-    res.status(200).json(data);
-  } catch (e) {
-    console.log(e);
-
-    res.status(500).json({
-      error: true,
-    });
-  }
-});
-
-app.use(homeRoute);
+app.use('/', homeRoute);
+app.use('/ifttt', iftttRoute);
 
 const PORT = process.env.PORT || '3000';
 
