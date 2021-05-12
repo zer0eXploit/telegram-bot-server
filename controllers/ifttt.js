@@ -21,25 +21,8 @@ exports.specificUserTweeted = async (req, res) => {
 
   try {
     const parameters = { status: text, trim_user: true };
-    const notiTitle = 'Tweeted on twitter';
-    const notiMessage = 'A new tweet was successfully tweeted.';
-    const priority = 1;
-    const linkText = 'Click to view the tweet.';
 
     const tweet = await Twitter.tweets.statusesUpdate(parameters);
-
-    const linkUrl = `https://twitter.com/yw_pann/status/${tweet.id_str}`;
-
-    const pushoverRes = await sendNotification(
-      notiTitle,
-      notiMessage,
-      priority,
-      linkUrl,
-      linkText,
-    );
-
-    if (!pushoverRes.ok)
-      throw new Error(`Pushover server error. Status ${pushoverRes.status}`);
 
     return res.status(200).json({
       success: true,
