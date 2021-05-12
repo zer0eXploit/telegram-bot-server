@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const fetch = require('node-fetch');
 const TelegramBot = require('node-telegram-bot-api');
+const Twitter = require('./helper/twitter-api');
 
 const app = express();
 
@@ -10,6 +11,9 @@ const app = express();
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.text());
+
+// Routes
+const homeRoute = require('./routes/home');
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_API_KEY;
@@ -130,10 +134,6 @@ bot.on('message', (message) => {
   console.log(message);
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html');
-});
-
 app.post('/ifttt-post', async (req, res) => {
   const [text, username, link] = req.body.split(' @splitter ');
   console.log(req.body);
@@ -163,5 +163,24 @@ app.post('/ifttt-post', async (req, res) => {
   }
 });
 
+app.get('/tw-test', async (req, res) => {
+  try {
+    const data = await Twitter.tweets.statusesUpdate({
+      status: 'Tweeted via Twitter API.',
+    });
+
+    res.status(200).json(data);
+  } catch (e) {
+    console.log(e);
+
+    res.status(500).json({
+      error: true,
+    });
+  }
+});
+
+app.use(homeRoute);
+
 const PORT = process.env.PORT || '3000';
+
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`));
