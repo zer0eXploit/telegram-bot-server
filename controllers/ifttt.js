@@ -46,9 +46,13 @@ exports.specificUserTweeted = async (req, res) => {
       tweet: tweet,
     });
   } catch (e) {
+    let message = e.message;
     const notiTitle = 'Error tweeting';
-    const message = e.message;
     const priority = 1;
+
+    if (e.statusCode) {
+      message = e.data.errors[0].message;
+    }
 
     await sendNotification(notiTitle, message, priority);
 
