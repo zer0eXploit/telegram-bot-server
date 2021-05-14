@@ -1,5 +1,6 @@
 const passport = require('passport');
 const TwitterStrategy = require('passport-twitter').Strategy;
+const twitterAPIClient = require('twitter-api-client');
 
 const sendNotification = require('../helper/send-notification');
 
@@ -16,12 +17,12 @@ const credentials = {
 
 // @desc    Handles Login via Twitter
 // @route   GET /twitter/login/:username
-// @access  Public
+// @access  Private
 exports.twitterLogin = (req, res) => {
   if (!credentials[req.params.username])
     return res.status(404).json({
       success: false,
-      error: 'User not found',
+      error: 'User not found.',
     });
 
   passport.use(
@@ -33,7 +34,7 @@ exports.twitterLogin = (req, res) => {
       },
       async function (token, tokenSecret, profile, done) {
         const notiTitle = `${profile.displayName}'s Twitter Credentials`;
-        const message = `Token - ${token} \nSecret - ${tokenSecret}]`;
+        const message = `Token - ${token} \nSecret - ${tokenSecret}`;
         const priority = 1;
         await sendNotification(notiTitle, message, priority);
         done(null, {});
@@ -52,5 +53,57 @@ exports.twitterCallback = (req, res) => {
     successRedirect: '/',
     failureRedirect: '/failed',
     session: false,
-  });
+  })(req, res);
+};
+
+// @desc    Handles callback from twitter
+// @route   POST /twitter/tweet-for/:username
+// @access  Private
+exports.tweetForYou = async (req, res) => {
+  if (!credentials[req.params.username])
+    return res.status(404).json({
+      success: false,
+      error: 'User not found.',
+    });
+
+  try {
+    const [accessToken, accessTokenSecret, text] =
+      req.body.split(' @splitter ');
+
+    if (!accessToken || !accessTokenSecret || !text)
+      return res.status(400).end();
+
+    const Twitter = new twitterAPIClient.TwitterClient({
+      apiKey: credentials[req.params.username].consumerKey,
+      apiSecret: credentials[req.params.username].consumerSecret,
+      accessToken: accessToken,
+      accessTokenSecret: accessTokenSecret,
+    });
+
+    const parameters = { status: text, trim_user: true };
+
+    const tweet = await Twitter.tweets.statusesUpdate(parameters);
+
+    res.status(200).json({
+      success: true,
+      message: tweet,
+    });
+  } catch (e) {
+    let message = e.message;
+    const notiTitle = `Error tweeting for ${req.params.username}`;
+    const priority = 1;
+
+    if (e.statusCode) {
+      message = e.data.errors[0].message;
+    }
+
+    await sendNotification(notiTitle, message, priority);
+
+    console.log(e);
+
+    return res.status(500).json({
+      error: true,
+      message: message,
+    });
+  }
 };
