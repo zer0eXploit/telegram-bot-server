@@ -94,7 +94,7 @@ exports.tweetForYou = async (req, res) => {
     const priority = 1;
 
     if (e.statusCode) {
-      message = e.data.errors[0].message;
+      message = JSON.stringify(e);
     }
 
     await sendNotification(notiTitle, message, priority);
