@@ -1,26 +1,15 @@
 const fetch = require('node-fetch');
 
-const sendNotification = (
-  title,
-  msg,
-  priority = 1,
-  link = null,
-  linkTitle = null,
-) => {
-  return fetch('https://api.pushover.net/1/messages.json', {
+const sendNotification = (errorData) => {
+  console.log(errorData);
+  console.log('I am called!');
+  const uri = process.env.TWEET_ERROR_WEBHOOK_URI;
+  return fetch(uri, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
-    body: JSON.stringify({
-      token: process.env.PUSHOVER_NOTIFICATION_API,
-      user: process.env.PUSHOVER_NOTIFICATION_USER_KEY,
-      title: title,
-      message: msg,
-      priority: priority,
-      url: link,
-      url_title: linkTitle,
-    }),
+    body: JSON.stringify(errorData),
   });
 };
 
