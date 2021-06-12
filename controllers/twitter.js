@@ -5,10 +5,6 @@ const twitterAPIClient = require('twitter-api-client');
 const sendNotification = require('../helper/send-notification');
 
 const credentials = {
-  psst: {
-    consumerKey: process.env.PSST_TWITTER_API_KEY,
-    consumerSecret: process.env.PSST_TWITTER_API_SECRET,
-  },
   hmnoo: {
     consumerKey: process.env.HMNOO_TWITTER_API_KEY,
     consumerSecret: process.env.HMNOO_TWITTER_API_SECRET,
@@ -90,14 +86,24 @@ exports.tweetForYou = async (req, res) => {
     });
   } catch (e) {
     let message = e.message;
-    const notiTitle = `Error tweeting for ${req.params.username}`;
-    const priority = 1;
+    let notiData = {
+      value1: e.message,
+    };
 
-    if (e.statusCode) {
-      message = JSON.stringify(e);
+    try {
+      if (e.statusCode) {
+        message = e.data.errors[0].message;
+        notiData = {
+          value1: e.statusCode,
+          value2: e.data.errors[0].code,
+          value3: e.data.errors[0].message,
+        };
+      }
+
+      await sendNotification(notiData);
+    } catch (e) {
+      console.log(e);
     }
-
-    await sendNotification(notiTitle, message, priority);
 
     console.log(e);
 

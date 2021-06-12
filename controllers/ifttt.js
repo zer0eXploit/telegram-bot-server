@@ -10,17 +10,17 @@ const sendNotification = require('../helper/send-notification');
 exports.specificUserTweeted = async (req, res) => {
   const key = req.query.accessKey;
 
-  if (key !== process.env.SERVER_ACCESS_KEY) {
-    return res.status(403).json({
-      error: true,
-      message: 'Access key is required!',
-    });
-  }
-
-  const text = req.body.split(' @splitter ')[0];
-  // username and link at indices 1 and 2 respectively
+  // if (key !== process.env.SERVER_ACCESS_KEY) {
+  //   return res.status(403).json({
+  //     error: true,
+  //     message: 'Access key is required!',
+  //   });
+  // }
 
   try {
+    const text = req.body.split(' @splitter ')[0];
+    // username and link at indices 1 and 2 respectively
+
     const parameters = { status: text, trim_user: true };
 
     const tweet = await Twitter.tweets.statusesUpdate(parameters);
@@ -31,14 +31,24 @@ exports.specificUserTweeted = async (req, res) => {
     });
   } catch (e) {
     let message = e.message;
-    const notiTitle = 'Error tweeting';
-    const priority = 1;
+    let notiData = {
+      value1: e.message,
+    };
 
-    if (e.statusCode) {
-      message = e.data.errors[0].message;
+    try {
+      if (e.statusCode) {
+        message = e.data.errors[0].message;
+        notiData = {
+          value1: e.statusCode,
+          value2: e.data.errors[0].code,
+          value3: e.data.errors[0].message,
+        };
+      }
+
+      await sendNotification(notiData);
+    } catch (e) {
+      console.log(e);
     }
-
-    await sendNotification(notiTitle, message, priority);
 
     console.log(e);
 
@@ -74,10 +84,8 @@ exports.handleIFTTTCallFromPerson = async (req, res) => {
     });
   } catch (e) {
     const message = 'Error calling IFTTT wehbook.';
-    const notiTitle = 'Error calling IFTTT from H';
-    const priority = 1;
 
-    await sendNotification(notiTitle, message, priority);
+    await sendNotification({ value1: message });
 
     console.log(e);
 
