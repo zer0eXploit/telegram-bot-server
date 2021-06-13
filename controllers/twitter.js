@@ -92,11 +92,13 @@ exports.tweetForYou = async (req, res) => {
 
     try {
       if (e.statusCode) {
-        message = e.data.errors[0].message;
+        const errorData = JSON.parse(e.data);
+        message = errorData.errors[0].message;
+
         notiData = {
           value1: e.statusCode,
-          value2: e.data.errors[0].code,
-          value3: e.data.errors[0].message,
+          value2: errorData.errors[0].code,
+          value3: errorData.errors[0].message,
         };
       }
 
