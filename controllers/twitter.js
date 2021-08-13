@@ -52,7 +52,7 @@ exports.twitterCallback = (req, res) => {
   })(req, res);
 };
 
-// @desc    Handles callback from twitter
+// @desc    Tweet on behalf of user
 // @route   POST /twitter/tweet-for/:username
 // @access  Private
 exports.tweetForYou = async (req, res) => {
