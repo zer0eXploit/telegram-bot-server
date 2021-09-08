@@ -11,6 +11,7 @@
   "author": "Yan Waipann",
   "license": "MIT",
   "dependencies": {
+    "airtable": "^0.11.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
