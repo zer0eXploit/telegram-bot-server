@@ -76,11 +76,14 @@ exports.twitterCallback = (req, res) => {
 // @route   POST /twitter/tweet-for/:username
 // @access  Private
 exports.tweetForYou = async (req, res) => {
-  if (!credentials[req.params.username])
-    return res.status(404).json({
-      success: false,
-      error: "User not found.",
+  const records = await userExists(req.params.username);
+
+  if (!!!records.length) {
+    return res.status(401).json({
+      error: true,
+      message: "You are not an authorized user.",
     });
+  }
 
   try {
     const [accessToken, accessTokenSecret, text] =
@@ -90,8 +93,8 @@ exports.tweetForYou = async (req, res) => {
       return res.status(400).end();
 
     const Twitter = new twitterAPIClient.TwitterClient({
-      apiKey: credentials[req.params.username].consumerKey,
-      apiSecret: credentials[req.params.username].consumerSecret,
+      apiKey: records[0].get("consumer_key"),
+      apiSecret: records[0].get("consumer_secret"),
       accessToken: accessToken,
       accessTokenSecret: accessTokenSecret,
     });
@@ -105,21 +108,27 @@ exports.tweetForYou = async (req, res) => {
       message: tweet,
     });
   } catch (e) {
-    let message = e.message;
+    let errMessage = e.message;
     let notiData = {
-      value1: e.message,
+      value1: "Auto Tweeting Error",
+      value2: e.message,
     };
 
     try {
       if (e.statusCode) {
         const errorData = JSON.parse(e.data);
-        message = errorData.errors[0].message;
+        const { code, message } = errorData.errors[0];
+        errMessage = message;
 
         notiData = {
-          value1: e.statusCode,
-          value2: errorData.errors[0].code,
-          value3: errorData.errors[0].message,
+          value1: "Auto Tweeting Error",
+          value2: `Error code - ${code}`,
+          value3: message,
         };
+      } else {
+        // Log error only if it is not from twitter
+        // because twitter errors always contain statusCode
+        console.log(e);
       }
 
       await sendNotification(notiData);
@@ -127,11 +136,9 @@ exports.tweetForYou = async (req, res) => {
       console.log(e);
     }
 
-    console.log(e);
-
     return res.status(500).json({
       error: true,
-      message: message,
+      message: errMessage,
     });
   }
 };
