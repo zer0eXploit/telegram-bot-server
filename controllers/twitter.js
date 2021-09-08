@@ -1,53 +1,79 @@
-const passport = require('passport');
-const TwitterStrategy = require('passport-twitter').Strategy;
-const twitterAPIClient = require('twitter-api-client');
+const passport = require("passport");
+const Airtable = require("airtable");
+const TwitterStrategy = require("passport-twitter").Strategy;
+const twitterAPIClient = require("twitter-api-client");
 
-const sendNotification = require('../helper/send-notification');
-
-const credentials = {
-  hmnoo: {
-    consumerKey: process.env.HMNOO_TWITTER_API_KEY,
-    consumerSecret: process.env.HMNOO_TWITTER_API_SECRET,
-  },
-};
+const sendNotification = require("../helper/send-notification");
 
 // @desc    Handles Login via Twitter
 // @route   GET /twitter/login/:username
 // @access  Private
-exports.twitterLogin = (req, res) => {
-  if (!credentials[req.params.username])
-    return res.status(404).json({
-      success: false,
-      error: 'User not found.',
+exports.twitterLogin = async (req, res) => {
+  try {
+    const apiKey = process.env.AIR_TABLE_API_KEY;
+    const filterByFormula = `{username} = '${req.params.username}'`;
+    const base = new Airtable({ apiKey }).base("appRCF5ZGpwgJVzd6");
+
+    const records = await base("AllowedUsers")
+      .select({ filterByFormula })
+      .firstPage();
+
+    if (!!!records.length) {
+      return res.status(401).json({
+        error: true,
+        message: "You are not an authorized user.",
+      });
+    }
+
+    // Authenticate with passport and send the access token via notification
+    passport.use(
+      new TwitterStrategy(
+        {
+          consumerKey: records[0].get("consumer_key"),
+          consumerSecret: records[0].get("consumer_secret"),
+          callbackURL: process.env.TWITTER_CALLBACK_URL,
+        },
+        async function (token, tokenSecret, profile, done) {
+          const notiTitle = `${profile.username}'s Twitter Credentials`;
+          const message = `Token - ${token} \nSecret - ${tokenSecret}`;
+          const notiInfo = {
+            value1: notiTitle,
+            value2: message,
+            value3: "",
+          };
+          await sendNotification(notiInfo);
+          done(null, {});
+        },
+      ),
+    );
+
+    return passport.authenticate("twitter")(req, res);
+  } catch (e) {
+    try {
+      const notiInfo = {
+        value1: "Twitter Login Error",
+        value2: "An error occurred while logging in via Twitter.",
+        value3: e.message,
+      };
+      await sendNotification(notiInfo);
+    } catch (e) {
+      console.log(e);
+    }
+
+    return res.status(500).json({
+      error: true,
+      message: "Something went wrong on our server.",
     });
-
-  passport.use(
-    new TwitterStrategy(
-      {
-        consumerKey: credentials[req.params.username].consumerKey,
-        consumerSecret: credentials[req.params.username].consumerSecret,
-        callbackURL: process.env.TWITTER_CALLBACK_URL,
-      },
-      async function (token, tokenSecret, profile, done) {
-        const notiTitle = `${profile.displayName}'s Twitter Credentials`;
-        const message = `Token - ${token} \nSecret - ${tokenSecret}`;
-        const priority = 1;
-        await sendNotification(notiTitle, message, priority);
-        done(null, {});
-      },
-    ),
-  );
-
-  return passport.authenticate('twitter')(req, res);
+  }
 };
 
 // @desc    Handles callback from twitter
 // @route   GET /twitter/callback
 // @access  Public
 exports.twitterCallback = (req, res) => {
-  return passport.authenticate('twitter', {
-    successRedirect: '/',
-    failureRedirect: '/failed',
+  return passport.authenticate("twitter", {
+    successRedirect: "/",
+    failureRedirect: "/failed",
     session: false,
   })(req, res);
 };
@@ -59,12 +85,12 @@ exports.tweetForYou = async (req, res) => {
   if (!credentials[req.params.username])
     return res.status(404).json({
       success: false,
-      error: 'User not found.',
+      error: "User not found.",
     });
 
   try {
     const [accessToken, accessTokenSecret, text] =
-      req.body.split(' @splitter ');
+      req.body.split(" @splitter ");
 
     if (!accessToken || !accessTokenSecret || !text)
       return res.status(400).end();
