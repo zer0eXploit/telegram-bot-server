@@ -1,8 +1,8 @@
 const passport = require("passport");
-const Airtable = require("airtable");
 const TwitterStrategy = require("passport-twitter").Strategy;
 const twitterAPIClient = require("twitter-api-client");
 
+const userExists = require("../helper/air-table");
 const sendNotification = require("../helper/send-notification");
 
 // @desc    Handles Login via Twitter
@@ -10,13 +10,7 @@ const sendNotification = require("../helper/send-notification");
 // @access  Private
 exports.twitterLogin = async (req, res) => {
   try {
-    const apiKey = process.env.AIR_TABLE_API_KEY;
-    const filterByFormula = `{username} = '${req.params.username}'`;
-    const base = new Airtable({ apiKey }).base("appRCF5ZGpwgJVzd6");
-
-    const records = await base("AllowedUsers")
-      .select({ filterByFormula })
-      .firstPage();
+    const records = await userExists(req.params.username);
 
     if (!!!records.length) {
       return res.status(401).json({
