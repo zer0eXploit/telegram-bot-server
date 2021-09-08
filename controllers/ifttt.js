@@ -5,16 +5,17 @@ const sendNotification = require("../helper/send-notification");
 // @desc    Handle webhook call from IFTTT, calls the twitter API to tweet.
 // @desc    IFTTT calls whenever the twitter user being watched tweets.
 // @route   POST /ifttt/user-tweeted
-// @access  Public
+// @access  Private
+// @auth    Custom access key
 exports.specificUserTweeted = async (req, res) => {
   const key = req.query.accessKey;
 
-  // if (key !== process.env.SERVER_ACCESS_KEY) {
-  //   return res.status(403).json({
-  //     error: true,
-  //     message: 'Access key is required!',
-  //   });
-  // }
+  if (key !== process.env.SERVER_ACCESS_KEY) {
+    return res.status(403).json({
+      error: true,
+      message: "Access key is required!",
+    });
+  }
 
   try {
     const text = req.body.split(" @splitter ")[0];
