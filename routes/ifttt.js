@@ -1,14 +1,10 @@
 // Core Modules
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 // Controllers
-const {
-  specificUserTweeted,
-  handleIFTTTCallFromPerson,
-} = require('../controllers/ifttt');
+const { specificUserTweeted } = require("../controllers/ifttt");
 
-router.route('/user-tweeted').post(specificUserTweeted);
-router.route('/hmnoo/user-tweeted').post(handleIFTTTCallFromPerson);
+router.route("/user-tweeted").post(specificUserTweeted);
 
 module.exports = router;
