@@ -8,7 +8,7 @@ const sendNotification = require("../helper/send-notification");
 // @desc    Handles Login via Twitter
 // @route   GET /twitter/login/:username
 // @access  Private
-exports.twitterLogin = async (req, res) => {
+exports.twitterLogin = async (req, res, next) => {
   try {
     const records = await userExists(req.params.username);
 
@@ -41,7 +41,7 @@ exports.twitterLogin = async (req, res) => {
       ),
     );
 
-    return passport.authenticate("twitter")(req, res);
+    return passport.authenticate("twitter")(req, res, next);
   } catch (e) {
     try {
       const notiInfo = {
@@ -64,12 +64,12 @@ exports.twitterLogin = async (req, res) => {
 // @desc    Handles callback from twitter
 // @route   GET /twitter/callback
 // @access  Public
-exports.twitterCallback = (req, res) => {
+exports.twitterCallback = (req, res, next) => {
   return passport.authenticate("twitter", {
     successRedirect: "/",
     failureRedirect: "/failed",
     session: false,
-  })(req, res);
+  })(req, res, next);
 };
 
 // @desc    Tweet on behalf of user
