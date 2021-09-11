@@ -2,7 +2,7 @@ const botUsername = process.env.BOT_USERNAME;
 
 const commands = {
   INTRODUCE: new RegExp(`^(\/introduce|\/introduce@${botUsername})`),
-  GREETINGS: new RegExp(`/^(Hello|Hi|Greetings|Greeting|Sup|Hey)/i`),
+  GREETINGS: /^(Hello|Hi|Greetings|Greeting|Sup|Hey)/i,
   ECHO: new RegExp(
     `(^(\/echo|\/echo@${botUsername}) (.+))|^(\/echo|\/echo@${botUsername})$`,
   ),
