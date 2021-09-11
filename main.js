@@ -1,15 +1,15 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const express = require('express');
-const session = require('express-session');
-const passport = require('passport');
+const express = require("express");
+const session = require("express-session");
+const passport = require("passport");
 
-const TelegramBot = require('./helper/telegram-bot');
+require("./helper/telegram-bot");
 
 const app = express();
 
 // Static Folder Setup
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(express.text());
 app.use(passport.initialize());
@@ -23,14 +23,14 @@ app.use(
 );
 
 // Routes
-const homeRoute = require('./routes/home');
-const iftttRoute = require('./routes/ifttt');
-const twitterRoute = require('./routes/twitter');
+const homeRoute = require("./routes/home");
+const iftttRoute = require("./routes/ifttt");
+const twitterRoute = require("./routes/twitter");
 
-app.use('/', homeRoute);
-app.use('/ifttt', iftttRoute);
-app.use('/twitter', twitterRoute);
+app.use("/", homeRoute);
+app.use("/ifttt", iftttRoute);
+app.use("/twitter", twitterRoute);
 
-const PORT = process.env.PORT || '3000';
+const PORT = process.env.PORT || "3000";
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}...`));
