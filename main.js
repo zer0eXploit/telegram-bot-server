@@ -3,6 +3,9 @@ require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
+const RedisStore = require("connect-redis")(session);
+
+const connectRedisDB = require("./config/redis-db");
 
 require("./helper/telegram-bot");
 
@@ -19,6 +22,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {},
+    store: new RedisStore({ client: connectRedisDB() }),
   }),
 );
 
