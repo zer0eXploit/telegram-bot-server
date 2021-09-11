@@ -2,7 +2,7 @@ const redis = require("redis");
 
 const connectRedisDB = () => {
   const config = {
-    url: process.env.REDIS_URI,
+    url: process.env.REDIS_URL,
   };
   const client = redis.createClient(config);
 
