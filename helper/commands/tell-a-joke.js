@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 
-const { TELL_A_JOKE } = require("./regexps");
+const { TELL_A_JOKE } = require("./constants/regexps");
 
 /**
  * @desc A command helper method that matches telegram bot command /tell_a_joke
